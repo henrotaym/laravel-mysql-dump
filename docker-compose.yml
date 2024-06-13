@@ -1,0 +1,59 @@
+services:
+  cli:
+    user: ${UID}:${GID}
+    image: henrotaym/laravel-mysql-dump-cli:local
+    build:
+      context: .
+      args:
+        - UID=${UID}
+        - GID=${GID}
+      dockerfile: Dockerfile
+      target: cli
+    environment:
+      - XDEBUG_MODE=coverage
+    volumes:
+      - ./:/opt/apps/app
+    networks:
+      - laravel-mysql-dump
+    env_file:
+      - .env
+    depends_on:
+      - laravel-mysql-dump-mysql
+    profiles:
+      - cli-only
+  bun:
+    user: ${UID}:${GID}
+    image: henrotaym/laravel-mysql-dump-bun:local
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: bun
+    volumes:
+      - ./:/opt/apps/app
+    profiles:
+      - cli-only
+  laravel-mysql-dump-mysql:
+    container_name: laravel-mysql-dump-mysql
+    image: 'mysql/mysql-server:8.0'
+    environment:
+      MYSQL_ROOT_PASSWORD: '${DB_PASSWORD}'
+      MYSQL_ROOT_HOST: '%'
+      MYSQL_DATABASE: '${DB_DATABASE}'
+      MYSQL_USER: '${DB_USERNAME}'
+      MYSQL_PASSWORD: '${DB_PASSWORD}'
+      MYSQL_ALLOW_EMPTY_PASSWORD: 1
+    volumes:
+      - laravel-mysql-dump-mysql:/var/lib/mysql
+      - ./docker/mysql/grant-tenants-db-access.sh:/docker-entrypoint-initdb.d/10-grant-tenants-db-access.sh
+    networks:
+      - laravel-mysql-dump
+    healthcheck:
+      test: ['CMD', 'mysqladmin', 'ping', '-p${DB_PASSWORD}']
+      retries: 3
+      timeout: 5s
+networks:
+  laravel-mysql-dump:
+    driver: bridge
+volumes:
+  laravel-mysql-dump-mysql:
+    driver: local
