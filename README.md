@@ -46,7 +46,27 @@ php artisan vendor:publish --tag="laravel-mysql-dump-views"
 ## Usage
 
 ```php
-@TODO
+// EXPORT
+$factory = app()->make(ExportStrategyFactory::class);
+$strategy = $factory->database(
+    env('DB_HOST'),
+    env('DB_PORT'),
+    env('DB_USERNAME'),
+    env('DB_PASSWORD'),
+    'tenant_4ab79e07-40ca-4c72-833e-a3f9354b4c3c',
+);
+$path = $strategy->export();
+
+// IMPORT
+$importFactory = app()->make(ImportStrategyFactory::class);
+$importStrategy = $importFactory->database(
+    env('DB_HOST'),
+    env('DB_PORT'),
+    env('DB_USERNAME'),
+    env('DB_PASSWORD'),
+    $path
+);
+$importStrategy->import();
 ```
 
 ## Testing
