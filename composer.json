@@ -9,9 +9,9 @@
     "homepage": "https://github.com/henrotaym/laravel-mysql-dump",
     "license": "MIT",
     "require": {
-        "php": "^8.2",
+        "php": "^8.0",
         "henrotaym/laravel-temporary-files": "^0.1.0",
-        "illuminate/contracts": "^10.0||^11.0",
+        "illuminate/contracts": "^9.0|^10.0||^11.0",
         "spatie/laravel-package-tools": "^1.16"
     },
     "require-dev": {
