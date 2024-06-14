@@ -58,6 +58,7 @@ $strategy = $factory->database(
 $path = $strategy->export();
 
 // IMPORT
+$path = '/absolute-path/to/my-file.sql';
 $importFactory = app()->make(ImportStrategyFactory::class);
 $importStrategy = $importFactory->database(
     env('DB_HOST'),
