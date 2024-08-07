@@ -1,5 +1,11 @@
 # @henrotaym/laravel-mysql-dump
 
+## 0.0.5
+
+### Patch Changes
+
+- 0deb5fc: Removing install script for laravel 8 support. Spatie package tools v1.12 missing hasInstallCommand method.
+
 ## 0.0.4
 
 ### Patch Changes
