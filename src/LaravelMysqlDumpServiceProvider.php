@@ -2,7 +2,6 @@
 
 namespace Henrotaym\LaravelMysqlDump;
 
-use Spatie\LaravelPackageTools\Commands\InstallCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
@@ -15,10 +14,6 @@ class LaravelMysqlDumpServiceProvider extends PackageServiceProvider
     {
         $package
             ->name('laravel-mysql-dump')
-            ->hasConfigFile('laravel-mysql-dump')
-            ->hasInstallCommand(function (InstallCommand $command) {
-                $command
-                    ->publishConfigFile();
-            });
+            ->hasConfigFile('laravel-mysql-dump');
     }
 }
