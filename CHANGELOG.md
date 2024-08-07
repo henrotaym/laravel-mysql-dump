@@ -1,5 +1,11 @@
 # @henrotaym/laravel-mysql-dump
 
+## 0.0.4
+
+### Patch Changes
+
+- fcc9907: Older spatie package version for laravel 8 support.
+
 ## 0.0.3
 
 ### Patch Changes
