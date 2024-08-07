@@ -1,5 +1,11 @@
 # @henrotaym/laravel-mysql-dump
 
+## 0.0.3
+
+### Patch Changes
+
+- 821ded6: Laravel 8 support?
+
 ## 0.0.2
 
 ### Patch Changes
