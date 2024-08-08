@@ -1,5 +1,11 @@
 # @henrotaym/laravel-mysql-dump
 
+## 0.0.7
+
+### Patch Changes
+
+- 1cbfcab: Requiring laravel v8 compatible temporary files package.
+
 ## 0.0.6
 
 ### Patch Changes
