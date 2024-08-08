@@ -1,5 +1,11 @@
 # @henrotaym/laravel-mysql-dump
 
+## 0.0.6
+
+### Patch Changes
+
+- 745b04c: str global helpers not yet available for laravel 8.
+
 ## 0.0.5
 
 ### Patch Changes
