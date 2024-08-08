@@ -1938,13 +1938,11 @@ class TypeAdapterMysql extends TypeAdapterFactory
             $createTable = preg_replace($match, $replace, $createTable);
         }
 
-        $createTable = str($createTable)->replace('"', '`')->toString();
+        $createTable = str_replace('"', '`', $createTable);
 
         if ($this->dumpSettings['if-not-exists']) {
             $createTable = preg_replace('/^CREATE TABLE/', 'CREATE TABLE IF NOT EXISTS', $createTable);
         }
-
-        // $createTable = str($createTable)->replace('"', '`')->toString();
 
         $ret = '/*!40101 SET @saved_cs_client     = @@character_set_client */;'.PHP_EOL.
             '/*!40101 SET character_set_client = '.$this->dumpSettings['default-character-set'].' */;'.PHP_EOL.
