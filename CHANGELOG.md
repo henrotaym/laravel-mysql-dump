@@ -1,5 +1,11 @@
 # @henrotaym/laravel-mysql-dump
 
+## 0.0.8
+
+### Patch Changes
+
+- 0f82f12: Using by default non persisted database connection to export elements.
+
 ## 0.0.7
 
 ### Patch Changes
