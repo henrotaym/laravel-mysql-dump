@@ -2,7 +2,4 @@
 
 namespace Henrotaym\LaravelMysqlDump;
 
-class LaravelMysqlDump
-{
-    
-}
+class LaravelMysqlDump {}

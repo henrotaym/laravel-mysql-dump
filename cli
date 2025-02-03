@@ -57,7 +57,7 @@ fi
 
 if [ "$1" == "analyze" ]
     then
-        ./cli ./vendor/bin/phpstan analyse ${@:2}
+        ./cli ./vendor/bin/phpstan analyse ${@:2} --memory-limit 256M
     exit
 fi
 

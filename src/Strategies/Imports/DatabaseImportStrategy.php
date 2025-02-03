@@ -14,8 +14,7 @@ class DatabaseImportStrategy implements ImportStrategy
         protected string $username,
         protected string $password,
         protected string $path
-    ) {
-    }
+    ) {}
 
     public function import(): void
     {

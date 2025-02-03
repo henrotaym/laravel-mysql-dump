@@ -5,6 +5,7 @@ namespace Henrotaym\LaravelMysqlDump\Services;
 use Exception;
 use PDO;
 use PDOException;
+use Throwable;
 
 class Mysqldump
 {
@@ -160,7 +161,7 @@ class Mysqldump
     ];
 
     protected $pdoSettingsDefault = [
-        PDO::ATTR_PERSISTENT => true,
+        PDO::ATTR_PERSISTENT => false,
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
     ];
 
@@ -222,6 +223,14 @@ class Mysqldump
      * Destructor of Mysqldump. Unsets dbHandlers and database objects.
      */
     public function __destruct()
+    {
+        $this->close();
+    }
+
+    /**
+     * Destructor of Mysqldump. Unsets dbHandlers and database objects.
+     */
+    public function close()
     {
         $this->dbHandler = null;
     }
@@ -380,7 +389,7 @@ class Mysqldump
                 case 'mysql':
                 case 'pgsql':
                 case 'dblib':
-                    $this->dbHandler = @new PDO(
+                    $this->dbHandler = new PDO(
                         $this->dsn,
                         $this->user,
                         $this->pass,
@@ -397,6 +406,9 @@ class Mysqldump
                     throw new Exception('Unsupported database type ('.$this->dbType.')');
             }
         } catch (PDOException $e) {
+            // Make sure to close connection
+            $this->close();
+
             throw new Exception(
                 'Connection to '.$this->dbType.' failed with message: '.
                 $e->getMessage()
@@ -426,83 +438,89 @@ class Mysqldump
             $this->fileName = $filename;
         }
 
-        // Connect to database
-        $this->connect();
+        try {
+            // Connect to database
+            $this->connect();
 
-        // Create output file
-        $this->compressManager->open($this->fileName);
+            // Create output file
+            $this->compressManager->open($this->fileName);
 
-        // Write some basic info to output file
-        $this->compressManager->write($this->getDumpFileHeader());
+            // Write some basic info to output file
+            $this->compressManager->write($this->getDumpFileHeader());
 
-        // initiate a transaction at global level to create a consistent snapshot
-        if ($this->dumpSettings['single-transaction']) {
-            $this->dbHandler->exec($this->typeAdapter->setup_transaction());
-            $this->dbHandler->exec($this->typeAdapter->start_transaction());
-        }
+            // initiate a transaction at global level to create a consistent snapshot
+            if ($this->dumpSettings['single-transaction']) {
+                $this->dbHandler->exec($this->typeAdapter->setup_transaction());
+                $this->dbHandler->exec($this->typeAdapter->start_transaction());
+            }
 
-        // Store server settings and use sanner defaults to dump
-        $this->compressManager->write(
-            $this->typeAdapter->backup_parameters()
-        );
-
-        if ($this->dumpSettings['databases']) {
+            // Store server settings and use sanner defaults to dump
             $this->compressManager->write(
-                $this->typeAdapter->getDatabaseHeader($this->dbName)
+                $this->typeAdapter->backup_parameters()
             );
-            if ($this->dumpSettings['add-drop-database']) {
+
+            if ($this->dumpSettings['databases']) {
                 $this->compressManager->write(
-                    $this->typeAdapter->add_drop_database($this->dbName)
+                    $this->typeAdapter->getDatabaseHeader($this->dbName)
+                );
+                if ($this->dumpSettings['add-drop-database']) {
+                    $this->compressManager->write(
+                        $this->typeAdapter->add_drop_database($this->dbName)
+                    );
+                }
+            }
+
+            // Get table, view, trigger, procedures, functions and events structures from
+            // database.
+            $this->getDatabaseStructureTables();
+            $this->getDatabaseStructureViews();
+            $this->getDatabaseStructureTriggers();
+            $this->getDatabaseStructureProcedures();
+            $this->getDatabaseStructureFunctions();
+            $this->getDatabaseStructureEvents();
+
+            if ($this->dumpSettings['databases']) {
+                $this->compressManager->write(
+                    $this->typeAdapter->databases($this->dbName)
                 );
             }
-        }
 
-        // Get table, view, trigger, procedures, functions and events structures from
-        // database.
-        $this->getDatabaseStructureTables();
-        $this->getDatabaseStructureViews();
-        $this->getDatabaseStructureTriggers();
-        $this->getDatabaseStructureProcedures();
-        $this->getDatabaseStructureFunctions();
-        $this->getDatabaseStructureEvents();
+            // If there still are some tables/views in include-tables array,
+            // that means that some tables or views weren't found.
+            // Give proper error and exit.
+            // This check will be removed once include-tables supports regexps.
+            if (count($this->dumpSettings['include-tables']) > 0) {
+                $name = implode(',', $this->dumpSettings['include-tables']);
+                throw new Exception('Table ('.$name.') not found in database');
+            }
 
-        if ($this->dumpSettings['databases']) {
+            $this->exportTables();
+            $this->exportTriggers();
+            $this->exportFunctions();
+            $this->exportProcedures();
+            $this->exportViews();
+            $this->exportEvents();
+
+            // Restore saved parameters.
             $this->compressManager->write(
-                $this->typeAdapter->databases($this->dbName)
+                $this->typeAdapter->restore_parameters()
             );
+
+            // end transaction
+            if ($this->dumpSettings['single-transaction']) {
+                $this->dbHandler->exec($this->typeAdapter->commit_transaction());
+            }
+
+            // Write some stats to output file.
+            $this->compressManager->write($this->getDumpFileFooter());
+            // Close output file.
+            $this->compressManager->close();
+        } catch (Throwable $exception) {
+            // Make sure to close connection
+            $this->close();
+
+            throw $exception;
         }
-
-        // If there still are some tables/views in include-tables array,
-        // that means that some tables or views weren't found.
-        // Give proper error and exit.
-        // This check will be removed once include-tables supports regexps.
-        if (count($this->dumpSettings['include-tables']) > 0) {
-            $name = implode(',', $this->dumpSettings['include-tables']);
-            throw new Exception('Table ('.$name.') not found in database');
-        }
-
-        $this->exportTables();
-        $this->exportTriggers();
-        $this->exportFunctions();
-        $this->exportProcedures();
-        $this->exportViews();
-        $this->exportEvents();
-
-        // Restore saved parameters.
-        $this->compressManager->write(
-            $this->typeAdapter->restore_parameters()
-        );
-
-        // end transaction
-        if ($this->dumpSettings['single-transaction']) {
-            $this->dbHandler->exec($this->typeAdapter->commit_transaction());
-        }
-
-        // Write some stats to output file.
-        $this->compressManager->write($this->getDumpFileFooter());
-        // Close output file.
-        $this->compressManager->close();
-
     }
 
     /**
@@ -1817,17 +1835,11 @@ abstract class TypeAdapterFactory
     }
 }
 
-class TypeAdapterPgsql extends TypeAdapterFactory
-{
-}
+class TypeAdapterPgsql extends TypeAdapterFactory {}
 
-class TypeAdapterDblib extends TypeAdapterFactory
-{
-}
+class TypeAdapterDblib extends TypeAdapterFactory {}
 
-class TypeAdapterSqlite extends TypeAdapterFactory
-{
-}
+class TypeAdapterSqlite extends TypeAdapterFactory {}
 
 class TypeAdapterMysql extends TypeAdapterFactory
 {

@@ -2,8 +2,8 @@
 
 namespace Henrotaym\LaravelMysqlDump\Facades;
 
-use Illuminate\Support\Facades\Facade;
 use Henrotaym\LaravelMysqlDump\LaravelMysqlDump as Implementation;
+use Illuminate\Support\Facades\Facade;
 
 /**
  * @see \Henrotaym\LaravelMysqlDump\LaravelMysqlDump

@@ -1,4 +1,4 @@
-FROM oven/bun:1 as bun
+FROM oven/bun:1 AS bun
 
 WORKDIR /opt/apps/app
 
@@ -8,7 +8,7 @@ COPY package.json bun.lockb* ./
 
 # ----------------------------------
 
-FROM php:8.2-cli-alpine3.19 as cli
+FROM php:8.2-cli-alpine3.19 AS cli
 
 RUN apk add --update --no-cache --virtual .build-phpize $PHPIZE_DEPS linux-headers && \
     pecl install xdebug && \

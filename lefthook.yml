@@ -4,6 +4,7 @@ pre-commit:
     format:
       glob: '*.{php}'
       run: ./cli format {staged_files}
+      stage_fixed: true
     analyze:
       glob: '*.{php}'
       run: ./cli analyze {staged_files}

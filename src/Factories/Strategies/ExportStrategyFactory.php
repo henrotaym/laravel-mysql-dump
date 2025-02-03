@@ -10,8 +10,7 @@ class ExportStrategyFactory
 {
     public function __construct(
         protected TemporaryFileServiceFactory $temporaryFileServiceFactory
-    ) {
-    }
+    ) {}
 
     public function database(
         string $host,
