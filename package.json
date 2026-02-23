@@ -1,6 +1,6 @@
 {
     "name": "@henrotaym/laravel-mysql-dump",
-    "version": "0.0.8",
+    "version": "1.0.0",
     "private": true,
     "license": "MIT",
     "devDependencies": {
