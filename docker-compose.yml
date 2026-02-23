@@ -35,6 +35,15 @@ services:
     networks:
       - laravel-mysql-dump
 
+  bun:
+    build:
+      context: .
+      target: bun
+      dockerfile: Dockerfile
+    image: "laravel-mysql-dump-bun-local"
+    volumes:
+      - ./:/opt/apps/app
+
 volumes:
   laravel-mysql-dump-mysql:
 
