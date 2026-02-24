@@ -1,5 +1,11 @@
 # @henrotaym/laravel-mysql-dump
 
+## 1.0.1
+
+### Patch Changes
+
+- 7ba82bc: Add changeset release infrastructure + bun
+
 ## 0.0.8
 
 ### Patch Changes
