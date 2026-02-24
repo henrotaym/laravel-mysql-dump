@@ -3,6 +3,13 @@
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/henrotaym/laravel-mysql-dump.svg?style=flat-square)](https://packagist.org/packages/henrotaym/laravel-mysql-dump)
 [![Total Downloads](https://img.shields.io/packagist/dt/henrotaym/laravel-mysql-dump.svg?style=flat-square)](https://packagist.org/packages/henrotaym/laravel-mysql-dump)
 
+## Compatibility
+
+| Laravel | Package |
+|---|---|
+| 10.x / 11.x | 0.x |
+| 12.x | 1.x |
+
 ## Installation
 
 You can install the package via composer:
